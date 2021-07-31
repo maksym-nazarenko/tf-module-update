@@ -104,17 +104,16 @@ func ParseSource(source string) (Source, error) {
 
 	query := parsedSource.Query()
 
-	// either revision is not specified
-	// or there are more than 1 query parameter
+	// there are more than 1 query parameter
 	// but we are not aware of them, so play defense
 	// to not break anything
-	if len(query) != 1 {
-		return result, &InvalidSourceFormatError{"revision is not specified or more than 1 query parameter found"}
+	if len(query) > 1 {
+		return result, &InvalidSourceFormatError{"more than 1 query parameter found"}
 	}
 
 	ref := query.Get("ref")
-	if ref == "" {
-		return result, &InvalidSourceFormatError{"no 'ref' query param found"}
+	if len(query) == 1 && ref == "" {
+		return result, &InvalidSourceFormatError{"query param is provided but it is not 'ref'"}
 	}
 
 	return Source{
