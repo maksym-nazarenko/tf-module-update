@@ -43,13 +43,19 @@ func TestParse(t *testing.T) {
 			sourceString:   "",
 			expectedStruct: Source{},
 		},
-		// negative scenarios
 		{
-			name:           "error if no revision in source URL",
-			expectedError:  &InvalidSourceFormatError{},
+			name:           "no revision",
+			expectedError:  nil,
 			sourceString:   "github.com/example-org/aws/vpc.git",
-			expectedStruct: Source{},
+			expectedStruct: Source{Scheme: "https", Host: "github.com", Module: "/example-org/aws/vpc.git", Submodule: "", Revision: Revision("")},
 		},
+		{
+			name:           "only scheme",
+			expectedError:  nil,
+			sourceString:   "http://",
+			expectedStruct: Source{Scheme: "http"},
+		},
+		// negative scenarios
 		{
 			name:           "unsupported prefix",
 			expectedError:  &InvalidSourceFormatError{},
