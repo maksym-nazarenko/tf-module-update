@@ -57,7 +57,10 @@ func run(config *AppConfig) int {
 		}).
 		WithCondition(updateCondition)
 
-	processing.NewManager(processing.Config{Write: config.Write}, strategy).
+	processing.NewManager(processing.Config{
+		Write:            config.Write,
+		ExcludeItemsFunc: processing.DefaultExclusionFunc,
+	}, strategy).
 		ProcessPaths(config.Paths, results)
 
 	if results.HasErrors() {

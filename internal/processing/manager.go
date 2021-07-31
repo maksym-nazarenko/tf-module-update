@@ -3,6 +3,7 @@ package processing
 import (
 	"errors"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -14,10 +15,19 @@ import (
 	"github.com/maxim-nazarenko/tf-module-update/internal/strategies"
 )
 
+// ExcludeFileFunc makes a decision if particular file/folder should be excluded
+type ExcludeFileFunc func(fs.FileInfo) bool
+
 // Config holds configuration for revision manager
 type Config struct {
 	// Write indicates if files should be updated
 	Write bool
+
+	// Exclude files/folders by name
+	ExcludeNames []string
+
+	// ExcludeItemsFunc checks if the given item should be excluded or not
+	ExcludeItemsFunc ExcludeFileFunc
 }
 
 // RevisionManager is responsible for managing module source updates
@@ -44,10 +54,20 @@ func (m *RevisionManager) ProcessPaths(paths []string, results *Results) {
 			results.Append(err)
 			continue
 		}
+
+		if m.config.ExcludeItemsFunc != nil && !m.config.ExcludeItemsFunc(info) {
+			continue
+		}
+
+		if len(m.config.ExcludeNames) > 0 && sliceContains(m.config.ExcludeNames, info.Name()) {
+			continue
+		}
+
 		if info.IsDir() {
 			m.processDir(absPath, results)
 			continue
 		}
+
 		if m.ignoredFile(absPath) {
 			continue
 		}
@@ -68,6 +88,14 @@ func (m *RevisionManager) processDir(path string, results *Results) {
 
 	var itemPath string
 	for _, item := range items {
+		if m.config.ExcludeItemsFunc != nil && !m.config.ExcludeItemsFunc(item) {
+			continue
+		}
+
+		if len(m.config.ExcludeNames) > 0 && sliceContains(m.config.ExcludeNames, item.Name()) {
+			continue
+		}
+
 		itemPath = filepath.Join(path, item.Name())
 		if item.IsDir() {
 			m.processDir(itemPath, results)
@@ -197,6 +225,15 @@ func (m *RevisionManager) processBlock(block *hclwrite.Block) Results {
 	)
 
 	return results
+}
+
+func sliceContains(slice []string, s string) bool {
+	for i := range slice {
+		if s == slice[i] {
+			return true
+		}
+	}
+	return false
 }
 
 func NewManager(config Config, strategy strategies.Strategy) *RevisionManager {
