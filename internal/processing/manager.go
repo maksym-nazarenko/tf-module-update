@@ -84,10 +84,8 @@ func (m *RevisionManager) processFile(fileName string) *Results {
 
 	results := &Results{}
 
-	results.Append(m.resultFactory.Info("In file " + fileName + ":"))
 	f, err := os.Open(fileName)
 	if err != nil {
-
 		results.Append(err)
 		return results
 	}
@@ -104,11 +102,18 @@ func (m *RevisionManager) processFile(fileName string) *Results {
 		return results
 	}
 
-	updatedFileBody, err := m.updateFileBody(src, normalizedPath, results)
+	infileHeader := m.resultFactory.Info("In file " + fileName + ":")
+	bodyResults := &Results{}
+	updatedFileBody, err := m.updateFileBody(src, normalizedPath, bodyResults)
+	if string(updatedFileBody) != string(src) {
+		results.Append(infileHeader)
+	}
+	results.Append(bodyResults)
 	if err != nil {
 		results.Append(err)
 		return results
 	}
+
 	if m.config.Write {
 		if err = ioutil.WriteFile(normalizedPath, updatedFileBody, 0644); err != nil {
 			results.Append(err)
