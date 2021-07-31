@@ -3,6 +3,10 @@ Terraform module source updater
 
 A simple tool to update host, module path or revision of a module.
 
+**Disclaimer**
+>This tool is under heavy development, so no part of it may be considered as stable.  
+Any commit may break the things so be sure to pin version to particular commit (releases are coming).
+
 > **NOTE**: Only git-over-https is well tested supported at the moment. More schemes and use cases might be added in the future
 
 Assume, there are a lot of blocks like these in your Terraform setup:
@@ -97,7 +101,6 @@ You can find a few `.tf` files to play with under [examples/fixture](examples/fi
 ### TBDs
 
 * add `Development` section
-* add Makefile
 * add Docker environment
 * add Github Actions
   * run tests
