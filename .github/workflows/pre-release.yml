@@ -24,6 +24,7 @@ jobs:
         os: ["linux", "darwin"]
         arch: ["amd64"]
     runs-on: ubuntu-20.04
+    needs: test
     steps:
       - name: Set up Go ${{ matrix.go-version }}
         uses: actions/setup-go@v2
