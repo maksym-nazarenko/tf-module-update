@@ -1,0 +1,23 @@
+name: CI pipeline
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.16.x]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - uses: actions/checkout@v2
+      - run: |
+          pwd
+          ls -la
+      - run: go test ./...
