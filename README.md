@@ -103,7 +103,5 @@ You can find a few `.tf` files to play with under [examples/fixture](examples/fi
 * add `Development` section
 * add Docker environment
 * add Github Actions
-  * run tests
-  * perform releases
   * deploy Docker images
 * make code available as package
