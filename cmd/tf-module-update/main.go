@@ -136,7 +136,10 @@ func parseFlags() (*AppConfig, error) {
 		fromSource.Revision = module.Revision(fromRevisionStr)
 	}
 
-	toSource := module.Source{}
+	toSource, err := module.ParseSource(toURL)
+	if err != nil {
+		return nil, err
+	}
 	if toScheme != "" {
 		toSource.Scheme = toScheme
 	}
